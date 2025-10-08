@@ -1,0 +1,5 @@
+/vendor/
+/.jekyll-cache/
+/_site/
+/bin/
+jekyll_output.log
