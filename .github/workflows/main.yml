@@ -22,7 +22,7 @@ jobs:
           bundler-cache: true # Automatically runs bundle install
 
       - name: Build the site
-        run: bundle exec jekyll build
+        run: bundle exec jekyll build --baseurl "/${{ github.event.repository.name }}"
 
       - name: Verify Build Output
         run: ls -R ./_site
