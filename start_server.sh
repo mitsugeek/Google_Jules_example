@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e # Exit immediately if a command exits with a non-zero status.
 
-# Navigate to the blog directory
-cd my-blog
+# Configure bundler to use a local vendor path
 
 # Configure bundler to use a local vendor path
 bundle config set --local path 'vendor/bundle'
