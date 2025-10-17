@@ -15,7 +15,7 @@ ref: myakumyaku-svg
 
 こちらがSVGで作成したミャクミャクです。
 
-![ミャクミャク](/assets/images/myakumyaku.svg)
+![ミャクミャク]({{ site.baseurl }}/assets/images/myakumyaku.svg)
 
 ## SVGでの表現
 
