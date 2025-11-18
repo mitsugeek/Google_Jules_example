@@ -61,6 +61,7 @@ minima:
     - { path: 'archive.md', title: 'Archive' }
     - { path: 'tags.md', title: 'Tags' }
     - { path: 'search.md', title: 'Search' }
+    - { path: 'kanji_pazzle.html', title: 'Kanji Puzzle' }
 
 # Exclude from processing.
 # The following items will not be processed, by default.
