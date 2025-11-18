@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>四字熟語パズル</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            touch-action: manipulation;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+```
+    /* Screen containers */
+    .screen {
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+    }
+    
+    /* Start Screen */
+    #startScreen {
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+    #startScreen h1 {
+        font-size: 32px;
+        margin-bottom: 40px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .start-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        max-width: 300px;
+    }
+    .btn-primary, .btn-secondary {
+        padding: 18px 30px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        touch-action: manipulation;
+        transition: transform 0.2s;
+        width: 100%;
+    }
+    .btn-primary {
+        background: white;
+        color: #667eea;
+    }
+    .btn-secondary {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 2px solid white;
+    }
+    .btn-primary:active, .btn-secondary:active {
+        transform: scale(0.95);
+    }
+    
+    /* Game Screen */
+    #gameScreen {
+        background: white;
+    }
+    .game-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .title {
+        text-align: center;
+        color: #667eea;
+        font-size: 20px;
+        padding: 8px 10px 5px;
+        font-weight: bold;
+    }
+    .info {
+        display: flex;
+        justify-content: space-around;
+        padding: 0 10px 5px;
+        font-size: 14px;
+    }
+    .score, .level {
+        padding: 5px 12px;
+        background: #f0f0f0;
+        border-radius: 15px;
+        font-weight: 600;
+    }
+    .hint-area {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 8px 10px;
+        margin: 0 8px 5px;
+        border-radius: 12px;
+        color: white;
+        text-align: center;
+    }
+    .hint-title {
+        font-size: 11px;
+        margin-bottom: 3px;
+        opacity: 0.95;
+    }
+    .hint-kanji {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 2px;
+        letter-spacing: 4px;
+    }
+    .hint-reading {
+        font-size: 13px;
+        opacity: 0.95;
+    }
+    .canvas-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 8px 8px;
+        flex: 1;
+        overflow: hidden;
+    }
+    #gameCanvas {
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        display: block;
+        background: #fafafa;
+        max-width: 100%;
+        max-height: 100%;
+        touch-action: none;
+    }
+    .swipe-hint {
+        text-align: center;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: #666;
+        background: #f9f9f9;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    /* Game Over Screen */
+    #gameOverScreen {
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+    #gameOverScreen h2 {
+        font-size: 32px;
+        margin-bottom: 30px;
+    }
+    .gameover-stats {
+        background: rgba(255,255,255,0.2);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        width: 100%;
+        max-width: 300px;
+    }
+    .gameover-stats p {
+        font-size: 18px;
+        margin: 10px 0;
+    }
+    .gameover-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    /* Collection Screen */
+    #collectionScreen {
+        background: white;
+    }
+    .collection-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+    .collection-header h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .collection-stats {
+        font-size: 14px;
+        opacity: 0.95;
+    }
+    .collection-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+    }
+    .yoji-card {
+        background: #f9f9f9;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border: 2px solid #e0e0e0;
+    }
+    .yoji-card.collected {
+        background: white;
+        border-color: #667eea;
+    }
+    .yoji-card.locked {
+        opacity: 0.5;
+    }
+    .yoji-card-kanji {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 5px;
+        letter-spacing: 3px;
+    }
+    .yoji-card.locked .yoji-card-kanji {
+        color: #999;
+    }
+    .yoji-card-reading {
+        font-size: 14px;
+        color: #764ba2;
+        margin-bottom: 8px;
+    }
+    .yoji-card.locked .yoji-card-reading {
+        color: #999;
+    }
+    .yoji-card-meaning {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+    }
+    .yoji-card.locked .yoji-card-meaning {
+        color: #999;
+        filter: blur(3px);
+    }
+    .collection-footer {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+    }
+    .collection-footer button {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+    .collection-footer button:active {
+        transform: scale(0.95);
+        background: #764ba2;
+    }
+    
+    /* Ranking Screen */
+    #rankingScreen {
+        background: white;
+    }
+    .ranking-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+    .ranking-header h2 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    .ranking-subtitle {
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    .ranking-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+    }
+    .ranking-item {
+        background: white;
+        border-radius: 12px;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        border: 2px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .ranking-item.top3 {
+        border-color: #FFD700;
+        background: linear-gradient(135deg, #FFF9E6 0%, #FFFBF0 100%);
+    }
+    .ranking-rank {
+        font-size: 20px;
+        font-weight: bold;
+        color: #667eea;
+        min-width: 35px;
+        text-align: center;
+    }
+    .ranking-item.top3 .ranking-rank {
+        font-size: 24px;
+    }
+    .ranking-rank.rank-1::before {
+        content: '🥇';
+        display: block;
+        font-size: 24px;
+    }
+    .ranking-rank.rank-1 {
+        font-size: 0;
+    }
+    .ranking-rank.rank-2::before {
+        content: '🥈';
+        display: block;
+        font-size: 24px;
+    }
+    .ranking-rank.rank-2 {
+        font-size: 0;
+    }
+    .ranking-rank.rank-3::before {
+        content: '🥉';
+        display: block;
+        font-size: 24px;
+    }
+    .ranking-rank.rank-3 {
+        font-size: 0;
+    }
+    .ranking-details {
+        flex: 1;
+    }
+    .ranking-score {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 3px;
+    }
+    .ranking-item.top3 .ranking-score {
+        font-size: 22px;
+        color: #D4AF37;
+    }
+    .ranking-info {
+        font-size: 12px;
+        color: #666;
+    }
+    .ranking-date {
+        font-size: 11px;
+        color: #999;
+        text-align: right;
+    }
+    .ranking-footer {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+    }
+    .ranking-footer button {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+    .ranking-footer button:active {
+        transform: scale(0.95);
+        background: #764ba2;
+    }
+    .no-records {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+    .no-records-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    
+    /* Popup styles */
+    .yojijukugo-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: white;
+        padding: 25px 15px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        text-align: center;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+        max-width: 85vw;
+        width: 300px;
+    }
+    .yojijukugo-popup.show {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    .yojijukugo-popup .kanji {
+        font-size: 36px;
+        color: #667eea;
+        margin-bottom: 10px;
+        font-weight: bold;
+        letter-spacing: 3px;
+    }
+    .yojijukugo-popup .reading {
+        font-size: 16px;
+        color: #764ba2;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    .yojijukugo-popup .meaning {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.5;
+        white-space: pre-line;
+    }
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        z-index: 999;
+    }
+    .overlay.show {
+        display: block;
+    }
+    
+    @media (max-height: 700px) {
+        .title {
+            font-size: 18px;
+            padding: 6px 10px 4px;
+        }
+        .info {
+            font-size: 13px;
+            padding: 0 10px 4px;
+        }
+        .hint-area {
+            padding: 6px 8px;
+            margin: 0 8px 4px;
+        }
+        .hint-kanji {
+            font-size: 20px;
+        }
+        .swipe-hint {
+            font-size: 11px;
+            padding: 6px 10px;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen">
+        <h1>📚 四字熟語パズル</h1>
+        <div class="start-buttons">
+            <button class="btn-primary" onclick="startGame()">ゲームスタート</button>
+            <button class="btn-secondary" onclick="showScreen('ranking')">ランキング</button>
+            <button class="btn-secondary" onclick="showScreen('collection')">コレクション</button>
+        </div>
+    </div>
+
+```
+<!-- Game Screen -->
+<div id="gameScreen" class="screen">
+    <div class="game-container">
+        <div class="title">📚 四字熟語パズル</div>
+        <div class="info">
+            <div class="score">スコア: <span id="score">0</span></div>
+            <div class="level">完成: <span id="completedCount">0</span></div>
+        </div>
+        <div class="hint-area">
+            <div class="hint-title">🎯 目標の四字熟語</div>
+            <div class="hint-kanji" id="hintKanji">----</div>
+            <div class="hint-reading" id="hintReading">準備中...</div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="400" height="600"></canvas>
+        </div>
+        <div class="swipe-hint">
+            👆 左右：移動 / 上：文字変更 / 下：落下
+        </div>
+    </div>
+</div>
+
+<!-- Game Over Screen -->
+<div id="gameOverScreen" class="screen">
+    <h2>ゲームオーバー</h2>
+    <div class="gameover-stats">
+        <p>最終スコア: <span id="finalScore">0</span></p>
+        <p>完成させた四字熟語: <span id="finalCompleted">0</span>個</p>
+    </div>
+    <div class="gameover-buttons">
+        <button class="btn-primary" onclick="startGame()">もう一度</button>
+        <button class="btn-secondary" onclick="showScreen('ranking')">ランキング</button>
+        <button class="btn-secondary" onclick="showScreen('collection')">コレクション</button>
+        <button class="btn-secondary" onclick="showScreen('start')">タイトルへ</button>
+    </div>
+</div>
+
+<!-- Collection Screen -->
+<div id="collectionScreen" class="screen">
+    <div class="collection-header">
+        <h2>📚 四字熟語コレクション</h2>
+        <div class="collection-stats">
+            <span id="collectionProgress">0/2</span> 収集済み
+        </div>
+    </div>
+    <div class="collection-content" id="collectionContent">
+        <!-- コレクション内容がここに動的に生成される -->
+    </div>
+    <div class="collection-footer">
+        <button onclick="showScreen('start')">タイトルへ戻る</button>
+    </div>
+</div>
+
+<!-- Ranking Screen -->
+<div id="rankingScreen" class="screen">
+    <div class="ranking-header">
+        <h2>🏆 ランキング</h2>
+        <div class="ranking-subtitle">TOP 10 ハイスコア</div>
+    </div>
+    <div class="ranking-content" id="rankingContent">
+        <!-- ランキング内容がここに動的に生成される -->
+    </div>
+    <div class="ranking-footer">
+        <button onclick="showScreen('start')">タイトルへ戻る</button>
+    </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="yojijukugo-popup" id="yojijukugoPopup">
+    <div class="kanji" id="popupKanji"></div>
+    <div class="reading" id="popupReading"></div>
+    <div class="meaning" id="popupMeaning"></div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const COLS = 8;
+    const ROWS = 12;
+    const CELL_SIZE = 50;
+    
+    let score = 0;
+    let completedCount = 0;
+    let gameRunning = false;
+    let currentPiece = null;
+    let board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+    let dropInterval = 1000;
+    let lastDropTime = 0;
+    let isPaused = false;
+    let targetYojijukugo = null;
+    let targetKanjiNeeded = [];
+    let chainCount = 0; // 連鎖カウンター
+    let collectedYojijukugo = new Set(); // コレクション（localStorage用）
+    let scoreHistory = []; // スコア履歴
+    let currentScreen = 'start'; // 'start', 'game', 'gameover', 'collection', 'ranking'
+    
+    // LocalStorageからコレクションを読み込む
+    function loadCollection() {
+        const saved = localStorage.getItem('yojijukugoCollection');
+        if (saved) {
+            collectedYojijukugo = new Set(JSON.parse(saved));
+        }
+    }
+    
+    // コレクションをLocalStorageに保存
+    function saveCollection() {
+        localStorage.setItem('yojijukugoCollection', JSON.stringify([...collectedYojijukugo]));
+    }
+    
+    // スコア履歴を読み込む
+    function loadScoreHistory() {
+        const saved = localStorage.getItem('yojijukugoScoreHistory');
+        if (saved) {
+            scoreHistory = JSON.parse(saved);
+        }
+    }
+    
+    // スコア履歴を保存
+    function saveScoreHistory() {
+        localStorage.setItem('yojijukugoScoreHistory', JSON.stringify(scoreHistory));
+    }
+    
+    // スコアを履歴に追加
+    function addScoreToHistory(finalScore, yojijukugoCount) {
+        const record = {
+            score: finalScore,
+            yojijukugoCount: yojijukugoCount,
+            date: new Date().toISOString(),
+            timestamp: Date.now()
+        };
+        scoreHistory.push(record);
+        // スコアの降順でソート
+        scoreHistory.sort((a, b) => b.score - a.score);
+        // 上位50件のみ保持
+        scoreHistory = scoreHistory.slice(0, 50);
+        saveScoreHistory();
+    }
+    
+    // 画面を切り替える
+    function showScreen(screenName) {
+        currentScreen = screenName;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('gameOverScreen').style.display = 'none';
+        document.getElementById('collectionScreen').style.display = 'none';
+        document.getElementById('rankingScreen').style.display = 'none';
+        
+        if (screenName === 'start') {
+            document.getElementById('startScreen').style.display = 'flex';
+        } else if (screenName === 'game') {
+            document.getElementById('gameScreen').style.display = 'flex';
+        } else if (screenName === 'gameover') {
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        } else if (screenName === 'collection') {
+            document.getElementById('collectionScreen').style.display = 'flex';
+            renderCollection();
+        } else if (screenName === 'ranking') {
+            document.getElementById('rankingScreen').style.display = 'flex';
+            renderRanking();
+        }
+    }
+
+    // 四字熟語データベース
+    const yojijukugoDatabase = [
+        { kanji: ['一', '喜', '一', '憂'], reading: 'いっきいちゆう', meaning: '喜んだり心配したりすること' },
+        { kanji: ['一', '長', '一', '短'], reading: 'いっちょういったん', meaning: '長所と短所があること' }
+    ];
+
+    // すべての漢字のリスト（重複なし）
+    const allKanji = [...new Set(yojijukugoDatabase.flatMap(y => y.kanji))];
+
+    function selectNewTarget() {
+        targetYojijukugo = yojijukugoDatabase[Math.floor(Math.random() * yojijukugoDatabase.length)];
+        targetKanjiNeeded = [...targetYojijukugo.kanji];
+        
+        // Update hint display
+        document.getElementById('hintKanji').textContent = targetYojijukugo.kanji.join('');
+        document.getElementById('hintReading').textContent = targetYojijukugo.reading;
+    }
+
+    class Piece {
+        constructor() {
+            // 70%の確率で目標の四字熟語から漢字を選ぶ
+            if (targetKanjiNeeded.length > 0 && Math.random() < 0.7) {
+                this.kanji = targetKanjiNeeded[Math.floor(Math.random() * targetKanjiNeeded.length)];
+            } else {
+                // 30%の確率でランダムな漢字
+                this.kanji = allKanji[Math.floor(Math.random() * allKanji.length)];
+            }
+            this.x = Math.floor(COLS / 2);
+            this.y = 0;
+        }
+
+        draw() {
+            ctx.fillStyle = '#764ba2';
+            ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.kanji, 
+                this.x * CELL_SIZE + CELL_SIZE / 2, 
+                this.y * CELL_SIZE + CELL_SIZE / 2);
+        }
+    }
+
+    function drawBoard() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw grid
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        for (let row = 0; row < ROWS; row++) {
+            for (let col = 0; col < COLS; col++) {
+                ctx.strokeRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            }
+        }
+
+        // Draw board pieces
+        for (let row = 0; row < ROWS; row++) {
+            for (let col = 0; col < COLS; col++) {
+                if (board[row][col]) {
+                    ctx.fillStyle = '#667eea';
+                    ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 28px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(board[row][col], 
+                        col * CELL_SIZE + CELL_SIZE / 2, 
+                        row * CELL_SIZE + CELL_SIZE / 2);
+                }
+            }
+        }
+
+        if (currentPiece && !isPaused) {
+            currentPiece.draw();
+        }
+    }
+
+    function canMove(x, y) {
+        if (x < 0 || x >= COLS || y >= ROWS) return false;
+        if (y < 0) return true;
+        return !board[y][x];
+    }
+
+    function mergePiece() {
+        if (currentPiece.y >= 0) {
+            board[currentPiece.y][currentPiece.x] = currentPiece.kanji;
+            chainCount = 0; // 新しいピースが置かれたら連鎖カウントリセット
+            checkYojijukugo();
+        }
+        currentPiece = new Piece();
+        if (!canMove(currentPiece.x, currentPiece.y)) {
+            gameOver();
+        }
+    }
+
+    function checkYojijukugo() {
+        const matches = []; // 見つかった全ての四字熟語を格納
+        
+        // Check horizontal 4-character sequences
+        for (let row = 0; row < ROWS; row++) {
+            for (let col = 0; col <= COLS - 4; col++) {
+                const sequence = [
+                    board[row][col],
+                    board[row][col + 1],
+                    board[row][col + 2],
+                    board[row][col + 3]
+                ];
+                
+                if (sequence.every(char => char !== null)) {
+                    // Check if this matches any yojijukugo
+                    for (let yoji of yojijukugoDatabase) {
+                        if (JSON.stringify(sequence) === JSON.stringify(yoji.kanji)) {
+                            matches.push({ row, col, yoji, direction: 'horizontal' });
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Check vertical 4-character sequences
+        for (let col = 0; col < COLS; col++) {
+            for (let row = 0; row <= ROWS - 4; row++) {
+                const sequence = [
+                    board[row][col],
+                    board[row + 1][col],
+                    board[row + 2][col],
+                    board[row + 3][col]
+                ];
+                
+                if (sequence.every(char => char !== null)) {
+                    // Check if this matches any yojijukugo
+                    for (let yoji of yojijukugoDatabase) {
+                        if (JSON.stringify(sequence) === JSON.stringify(yoji.kanji)) {
+                            matches.push({ row, col, yoji, direction: 'vertical' });
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If matches found, process all of them
+        if (matches.length > 0) {
+            highlightAndClearMultiple(matches);
+        }
+    }
+
+    function highlightAndClearMultiple(matches) {
+        isPaused = true;
+        chainCount++; // 連鎖カウントを増やす
+        
+        // Collect all highlight cells and kanji
+        const allHighlightCells = [];
+        const allKanjiToHighlight = [];
+        
+        matches.forEach(match => {
+            const { row, col, direction } = match;
+            const cells = [];
+            const kanji = [];
+            
+            if (direction === 'horizontal') {
+                for (let i = 0; i < 4; i++) {
+                    cells.push({ row, col: col + i });
+                    kanji.push(board[row][col + i]);
+                }
+            } else { // vertical
+                for (let i = 0; i < 4; i++) {
+                    cells.push({ row: row + i, col });
+                    kanji.push(board[row + i][col]);
+                }
+            }
+            
+            allHighlightCells.push(cells);
+            allKanjiToHighlight.push(kanji);
+        });
+        
+        // Animate highlight with vibrant colors
+        let flashCount = 0;
+        const flashInterval = setInterval(() => {
+            drawBoard();
+            
+            // Highlight all matched sets
+            allHighlightCells.forEach((cells, setIndex) => {
+                cells.forEach((cell, i) => {
+                    if (flashCount % 2 === 0) {
+                        // Gold background with shadow
+                        ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+                        ctx.shadowBlur = 20;
+                        ctx.fillStyle = '#FFD700'; // Gold
+                        ctx.fillRect(cell.col * CELL_SIZE, cell.row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        ctx.shadowBlur = 0;
+                        
+                        // Draw border
+                        ctx.strokeStyle = '#FF0000';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(cell.col * CELL_SIZE + 2, cell.row * CELL_SIZE + 2, 
+                                     CELL_SIZE - 4, CELL_SIZE - 4);
+                        
+                        // Draw kanji in white on gold background
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 32px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(allKanjiToHighlight[setIndex][i], 
+                            cell.col * CELL_SIZE + CELL_SIZE / 2, 
+                            cell.row * CELL_SIZE + CELL_SIZE / 2);
+                    } else {
+                        // Pink background with glow
+                        ctx.shadowColor = 'rgba(255, 100, 255, 0.8)';
+                        ctx.shadowBlur = 20;
+                        ctx.fillStyle = '#FF69B4'; // Hot pink
+                        ctx.fillRect(cell.col * CELL_SIZE, cell.row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        ctx.shadowBlur = 0;
+                        
+                        // Draw border
+                        ctx.strokeStyle = '#FFD700';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(cell.col * CELL_SIZE + 2, cell.row * CELL_SIZE + 2, 
+                                     CELL_SIZE - 4, CELL_SIZE - 4);
+                        
+                        // Draw kanji in gold on pink background
+                        ctx.fillStyle = '#FFD700';
+                        ctx.font = 'bold 32px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(allKanjiToHighlight[setIndex][i], 
+                            cell.col * CELL_SIZE + CELL_SIZE / 2, 
+                            cell.row * CELL_SIZE + CELL_SIZE / 2);
+                    }
+                });
+            });
+            
+            ctx.lineWidth = 2;
+            
+            flashCount++;
+            if (flashCount >= 8) {
+                clearInterval(flashInterval);
+                showMultipleYojijukugoPopup(matches);
+            }
+        }, 250);
+    }
+
+    function showMultipleYojijukugoPopup(matches) {
+        // Add to collection
+        matches.forEach(match => {
+            const key = match.yoji.kanji.join('');
+            collectedYojijukugo.add(key);
+        });
+        saveCollection();
+        
+        // Calculate score with chain bonus and multiple match bonus
+        const baseScore = 100 * matches.length;
+        const chainBonus = chainCount > 1 ? (chainCount - 1) * 50 : 0;
+        const multiBonus = matches.length > 1 ? (matches.length - 1) * 100 : 0;
+        const totalScore = baseScore + chainBonus + multiBonus;
+        
+        // Create display text
+        const kanjiList = matches.map(m => m.yoji.kanji.join('')).join('・');
+        const readingList = matches.map(m => m.yoji.reading).join('・');
+        
+        document.getElementById('popupKanji').textContent = kanjiList;
+        document.getElementById('popupReading').textContent = readingList;
+        
+        // Add bonus text to meaning
+        let meaningText = '';
+        if (matches.length > 1) {
+            meaningText += `✨ ${matches.length}個同時消し！ +${multiBonus}点ボーナス\n`;
+        }
+        if (chainCount > 1) {
+            meaningText += `🔥 ${chainCount}連鎖！ +${chainBonus}点ボーナス\n`;
+        }
+        if (meaningText) {
+            meaningText += '\n';
+        }
+        meaningText += matches.map(m => `${m.yoji.kanji.join('')}：${m.yoji.meaning}`).join('\n');
+        
+        document.getElementById('popupMeaning').textContent = meaningText;
+        
+        document.getElementById('overlay').classList.add('show');
+        document.getElementById('yojijukugoPopup').classList.add('show');
+        
+        setTimeout(() => {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('yojijukugoPopup').classList.remove('show');
+            
+            // Clear all matched cells
+            matches.forEach(match => {
+                const { row, col, direction } = match;
+                if (direction === 'horizontal') {
+                    for (let i = 0; i < 4; i++) {
+                        board[row][col + i] = null;
+                    }
+                } else { // vertical
+                    for (let i = 0; i < 4; i++) {
+                        board[row + i][col] = null;
+                    }
+                }
+            });
+            
+            score += totalScore;
+            completedCount += matches.length;
+            updateScore();
+            dropFloatingPieces();
+            
+            // Select new target yojijukugo
+            selectNewTarget();
+            
+            isPaused = false;
+            drawBoard();
+        }, 3000);
+    }
+
+    function highlightAndClear(row, col, yojijukugo, direction) {
+        isPaused = true;
+        chainCount++; // 連鎖カウントを増やす
+        
+        // Highlight the matched cells
+        const highlightCells = [];
+        const kanjiToHighlight = [];
+        if (direction === 'horizontal') {
+            for (let i = 0; i < 4; i++) {
+                highlightCells.push({ row, col: col + i });
+                kanjiToHighlight.push(board[row][col + i]);
+            }
+        } else { // vertical
+            for (let i = 0; i < 4; i++) {
+                highlightCells.push({ row: row + i, col });
+                kanjiToHighlight.push(board[row + i][col]);
+            }
+        }
+        
+        // Animate highlight with vibrant colors
+        let flashCount = 0;
+        const flashInterval = setInterval(() => {
+            drawBoard();
+            
+            // Alternate between gold and pink with glow effect
+            highlightCells.forEach((cell, i) => {
+                if (flashCount % 2 === 0) {
+                    // Gold background with shadow
+                    ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#FFD700'; // Gold
+                    ctx.fillRect(cell.col * CELL_SIZE, cell.row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw border
+                    ctx.strokeStyle = '#FF0000';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(cell.col * CELL_SIZE + 2, cell.row * CELL_SIZE + 2, 
+                                 CELL_SIZE - 4, CELL_SIZE - 4);
+                    
+                    // Draw kanji in white on gold background
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 32px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(kanjiToHighlight[i], 
+                        cell.col * CELL_SIZE + CELL_SIZE / 2, 
+                        cell.row * CELL_SIZE + CELL_SIZE / 2);
+                } else {
+                    // Pink background with glow
+                    ctx.shadowColor = 'rgba(255, 100, 255, 0.8)';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#FF69B4'; // Hot pink
+                    ctx.fillRect(cell.col * CELL_SIZE, cell.row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw border
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(cell.col * CELL_SIZE + 2, cell.row * CELL_SIZE + 2, 
+                                 CELL_SIZE - 4, CELL_SIZE - 4);
+                    
+                    // Draw kanji in gold on pink background
+                    ctx.fillStyle = '#FFD700';
+                    ctx.font = 'bold 32px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(kanjiToHighlight[i], 
+                        cell.col * CELL_SIZE + CELL_SIZE / 2, 
+                        cell.row * CELL_SIZE + CELL_SIZE / 2);
+                }
+            });
+            
+            ctx.lineWidth = 2;
+            
+            flashCount++;
+            if (flashCount >= 8) {
+                clearInterval(flashInterval);
+                showYojijukugoPopup(yojijukugo, row, col, direction);
+            }
+        }, 250);
+    }
+
+    function showYojijukugoPopup(yojijukugo, row, col, direction) {
+        // Calculate score with chain bonus
+        const baseScore = 100;
+        const chainBonus = chainCount > 1 ? (chainCount - 1) * 50 : 0;
+        const totalScore = baseScore + chainBonus;
+        
+        // Update popup with chain info
+        document.getElementById('popupKanji').textContent = yojijukugo.kanji.join('');
+        document.getElementById('popupReading').textContent = yojijukugo.reading;
+        
+        // Add chain bonus text to meaning if chain > 1
+        let meaningText = yojijukugo.meaning;
+        if (chainCount > 1) {
+            meaningText = `🔥 ${chainCount}連鎖！ +${chainBonus}点ボーナス\n\n${yojijukugo.meaning}`;
+        }
+        document.getElementById('popupMeaning').textContent = meaningText;
+        
+        document.getElementById('overlay').classList.add('show');
+        document.getElementById('yojijukugoPopup').classList.add('show');
+        
+        setTimeout(() => {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('yojijukugoPopup').classList.remove('show');
+            
+            // Clear the matched cells
+            if (direction === 'horizontal') {
+                for (let i = 0; i < 4; i++) {
+                    board[row][col + i] = null;
+                }
+            } else { // vertical
+                for (let i = 0; i < 4; i++) {
+                    board[row + i][col] = null;
+                }
+            }
+            
+            score += totalScore;
+            completedCount++;
+            updateScore();
+            dropFloatingPieces();
+            
+            // Select new target yojijukugo
+            selectNewTarget();
+            
+            isPaused = false;
+            drawBoard();
+        }, 3000);
+    }
+
+    function dropFloatingPieces() {
+        let piecesDropped = false;
+        for (let col = 0; col < COLS; col++) {
+            for (let row = ROWS - 2; row >= 0; row--) {
+                if (board[row][col]) {
+                    let newRow = row;
+                    while (newRow < ROWS - 1 && !board[newRow + 1][col]) {
+                        newRow++;
+                    }
+                    if (newRow !== row) {
+                        board[newRow][col] = board[row][col];
+                        board[row][col] = null;
+                        piecesDropped = true;
+                    }
+                }
+            }
+        }
+        
+        // If pieces dropped, check for new yojijukugo matches
+        if (piecesDropped) {
+            setTimeout(() => {
+                checkYojijukugo();
+            }, 300);
+        }
+    }
+
+    function moveLeft() {
+        if (currentPiece && !isPaused && canMove(currentPiece.x - 1, currentPiece.y)) {
+            currentPiece.x--;
+            drawBoard();
+        }
+    }
+
+    function moveRight() {
+        if (currentPiece && !isPaused && canMove(currentPiece.x + 1, currentPiece.y)) {
+            currentPiece.x++;
+            drawBoard();
+        }
+    }
+
+    function drop() {
+        if (!currentPiece || isPaused) return;
+        while (canMove(currentPiece.x, currentPiece.y + 1)) {
+            currentPiece.y++;
+        }
+        mergePiece();
+        drawBoard();
+    }
+
+    function rotate() {
+        // Cycle through different kanji
+        if (currentPiece && !isPaused) {
+            const currentIndex = allKanji.indexOf(currentPiece.kanji);
+            currentPiece.kanji = allKanji[(currentIndex + 1) % allKanji.length];
+            drawBoard();
+        }
+    }
+
+    function updateScore() {
+        document.getElementById('score').textContent = score;
+        document.getElementById('completedCount').textContent = completedCount;
+    }
+
+    function renderRanking() {
+        const content = document.getElementById('rankingContent');
+        content.innerHTML = '';
+        
+        if (scoreHistory.length === 0) {
+            content.innerHTML = `
+                <div class="no-records">
+                    <div class="no-records-icon">📊</div>
+                    <div>まだ記録がありません</div>
+                    <div style="font-size: 12px; margin-top: 8px;">ゲームをプレイしてスコアを記録しましょう！</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // 上位10件を表示
+        const top10 = scoreHistory.slice(0, 10);
+        
+        top10.forEach((record, index) => {
+            const rank = index + 1;
+            const date = new Date(record.date);
+            const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+            
+            const item = document.createElement('div');
+            item.className = `ranking-item ${rank <= 3 ? 'top3' : ''}`;
+            
+            item.innerHTML = `
+                <div class="ranking-rank rank-${rank}">${rank}</div>
+                <div class="ranking-details">
+                    <div class="ranking-score">${record.score.toLocaleString()}点</div>
+                    <div class="ranking-info">完成: ${record.yojijukugoCount}個</div>
+                </div>
+                <div class="ranking-date">${dateStr}</div>
+            `;
+            
+            content.appendChild(item);
+        });
+    }
+    
+    function renderCollection() {
+        const content = document.getElementById('collectionContent');
+        content.innerHTML = '';
+        
+        yojijukugoDatabase.forEach(yoji => {
+            const key = yoji.kanji.join('');
+            const isCollected = collectedYojijukugo.has(key);
+            
+            const card = document.createElement('div');
+            card.className = `yoji-card ${isCollected ? 'collected' : 'locked'}`;
+            
+            card.innerHTML = `
+                <div class="yoji-card-kanji">${isCollected ? key : '？？？？'}</div>
+                <div class="yoji-card-reading">${isCollected ? yoji.reading : '？？？？'}</div>
+                <div class="yoji-card-meaning">${isCollected ? yoji.meaning : 'まだ収集していません'}</div>
+            `;
+            
+            content.appendChild(card);
+        });
+        
+        document.getElementById('collectionProgress').textContent = 
+            `${collectedYojijukugo.size}/${yojijukugoDatabase.length}`;
+    }
+    
+    function startGame() {
+        score = 0;
+        completedCount = 0;
+        board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+        gameRunning = true;
+        isPaused = false;
+        chainCount = 0;
+        dropInterval = 1000;
+        
+        selectNewTarget();
+        currentPiece = new Piece();
+        updateScore();
+        showScreen('game');
+        lastDropTime = performance.now();
+        gameLoop();
+    }
+
+    function gameOver() {
+        gameRunning = false;
+        addScoreToHistory(score, completedCount);
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('finalCompleted').textContent = completedCount;
+        showScreen('gameover');
+    }
+
+    function gameLoop(timestamp = 0) {
+        if (!gameRunning) return;
+
+        if (!isPaused && timestamp - lastDropTime > dropInterval) {
+            if (currentPiece && canMove(currentPiece.x, currentPiece.y + 1)) {
+                currentPiece.y++;
+            } else if (currentPiece) {
+                mergePiece();
+            }
+            lastDropTime = timestamp;
+        }
+
+        // Only draw if not paused (to allow animation to show)
+        if (!isPaused) {
+            drawBoard();
+        }
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        if (!gameRunning || isPaused) return;
+        switch(e.key) {
+            case 'ArrowLeft': moveLeft(); break;
+            case 'ArrowRight': moveRight(); break;
+            case 'ArrowDown': drop(); break;
+            case 'ArrowUp': rotate(); break;
+            case ' ': drop(); break;
+        }
+    });
+
+    // Touch controls for swipe gestures
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    canvas.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, false);
+
+    canvas.addEventListener('touchend', (e) => {
+        if (!gameRunning || isPaused) return;
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const minSwipeDistance = 30;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            if (Math.abs(deltaX) > minSwipeDistance) {
+                if (deltaX > 0) {
+                    moveRight();
+                } else {
+                    moveLeft();
+                }
+            }
+        } else {
+            // Vertical swipe
+            if (Math.abs(deltaY) > minSwipeDistance) {
+                if (deltaY > 0) {
+                    drop();
+                } else {
+                    rotate();
+                }
+            }
+        }
+    }
+
+    // Initialize game
+    loadCollection();
+    loadScoreHistory();
+    showScreen('start');
+</script>
+```
+
+</body>
+</html>
